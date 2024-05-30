@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "calculator-webapp-backen"
+version = "0.1.0"
+description = ""
+authors = ["Simon Weiss <wonder@simonweiss.space>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.111.0"
+uvicorn = "^0.30.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
