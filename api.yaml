@@ -1,0 +1,274 @@
+openapi: 3.0.3
+info:
+  title: Namkha API
+  version: 1.0.0
+  contact:
+    name: Stanislav Davydov
+    email: davidovsv@yandex.ru
+
+tags:
+  - name: tz
+    description: Time zone related endpoints
+  - name: calc
+    description: Calculations
+
+paths:
+  /tz/{lat}/{lon}:
+    get:
+      operationId: getLocationTz
+      tags: [tz]
+      summary: Get TZ by location
+      parameters:
+        - $ref: "#/components/parameters/lat"
+        - $ref: "#/components/parameters/lon"
+      responses:
+        200:
+          description: Successful response with TZ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TZ"
+        404:
+          $ref: "#/components/responses/TZ_404"
+
+  /calculate:
+    post:
+      operationId: calculateNamkha
+      summary: Request Namkha calculations
+      tags: [calc]
+      requestBody:
+        $ref: "#/components/requestBodies/calculate"
+      responses:
+        200:
+          $ref: "#/components/responses/Calc_200"
+        400:
+          $ref: "#/components/responses/Calc_400"
+
+  /calculate/{id}:
+    get:
+      operationId: getCalculation
+      tags: [calc]
+      summary: Get calculation results by ID
+      parameters:
+        - $ref: "#/components/parameters/calcId"
+      responses:
+        200:
+          $ref: "#/components/responses/Calc_200"
+        404:
+          $ref: "#/components/responses/Calc_404"
+
+components:
+  parameters:
+    calcId:
+      name: id
+      in: path
+      description: Calculation ID
+      required: true
+      schema:
+        $ref: "#/components/schemas/ID"
+
+    lat:
+      name: lat
+      in: path
+      description: Latitude
+      required: true
+      schema:
+        $ref: "#/components/schemas/Coord"
+
+    lon:
+      name: lon
+      in: path
+      description: Longitude
+      required: true
+      schema:
+        $ref: "#/components/schemas/Coord"
+
+  requestBodies:
+    calculate:
+      description: Calculate Namkha request
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/NamkhaData"
+
+  responses:
+    TZ_404:
+      description: Time zone is not found
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ApiError"
+              - $ref: "#/components/schemas/Status_404"
+
+    Calc_200:
+      description: Namkha calculation request is successfuly submitted.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CalculationData"
+
+    Calc_400:
+      description: Parameters for calculation is not correct
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ApiError"
+              - $ref: "#/components/schemas/Status_400"
+
+    Calc_404:
+      description: Calculations are not found
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ApiError"
+              - $ref: "#/components/schemas/Status_404"
+
+  schemas:
+    ApiError:
+      description: Error response object
+      type: object
+      required:
+        - status
+        - timestamp
+        - message
+      properties:
+        status:
+          type: integer
+          description: HTTP status
+        timestamp:
+          $ref: "#/components/schemas/DateTime"
+        message:
+          type: string
+
+    CalculationData:
+      description: Namkha calculation data
+      type: object
+      required:
+        - id
+        - created
+        - status
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        created:
+          $ref: "#/components/schemas/DateTime"
+        finished:
+          $ref: "#/components/schemas/DateTime"
+        status:
+          type: string
+          default: new
+          enum:
+            - new
+            - in progress
+            - done
+            - failed
+        result:
+          type: object
+          required:
+            - page1
+            - page2
+            - pdf
+          properties:
+            page1:
+              $ref: "#/components/schemas/URL"
+            page2:
+              $ref: "#/components/schemas/URL"
+            pdf:
+              $ref: "#/components/schemas/URL"
+
+    Coord:
+      description: Decimal point coordinate
+      type: number
+      format: float
+      example: 12.37
+
+    DateTime:
+      description: Date-time
+      type: string
+      format: date-time
+      example: 1996-12-19T16:39:57-08:00
+
+    Status_400:
+      description: Status code for 400 Bad Request
+      type: object
+      properties:
+        status:
+          type: integer
+          enum:
+            - 400
+
+    Status_404:
+      description: Status code for 404 Not Found
+      type: object
+      properties:
+        status:
+          type: integer
+          enum:
+            - 400
+
+    URL:
+      description: URL of something
+      type: string
+      format: url
+
+    NamkhaData:
+      description: The data used for namkha calculations.
+      type: object
+      required:
+        - fraction
+        - datetime
+      properties:
+        method:
+          description: Method of calculation, can be classic or by Rinpoche
+          type: string
+          enum:
+            - classic
+            - rinpoche
+          default: rinpoche
+        fraction:
+          description: Date fraction used for Namkha calculation
+          type: string
+          enum:
+            - year
+            - month
+            - day
+            - hour
+        name:
+          description: >
+            Name to calculate the Namkha for. It doesn't affect the Namkha itself
+            but will be printed on calculated document. Actually it's optional.
+          type: string
+          example: John Doe
+        gender:
+          description: A gender of person who do the calculation for.
+          type: string
+          enum:
+            - male
+            - female
+        datetime:
+          description: >
+            Date and time with TZ specified for calculation. Depends on the calculation
+            `fraction` the year or the year and the month or the year and the month and the day
+            or the year the month and the day and the hour will be used from the `datetime`.
+          type: string
+          format: date-time
+          example: 1996-12-19T16:39:57-08:00
+
+    ID:
+      description: UUID, used for pointing to objects
+      type: string
+      format: uuid
+      example: f22fae5c-9b71-4d83-9ebe-a99a801c1508
+
+    TZ:
+      description: Time zone
+      type: string
+      example:
+        - Asia/Bangkok
+        - GMT+5
+        - UTC-1
+
