@@ -159,38 +159,60 @@ components:
         finished:
           $ref: "#/components/schemas/DateTime"
         status:
-          type: string
-          default: new
-          enum:
-            - new
-            - in progress
-            - done
-            - failed
+          $ref: "#/components/schemas/CalculationStatus"
         result:
-          type: object
-          required:
-            - page1
-            - page2
-            - pdf
-          properties:
-            page1:
-              $ref: "#/components/schemas/URL"
-            page2:
-              $ref: "#/components/schemas/URL"
-            pdf:
-              $ref: "#/components/schemas/URL"
+          $ref: "#/components/schemas/CalculationResult"
+
+    CalculationResult:
+      description: >
+        Result of Namkha generation: two paged illustration and PDF
+      type: object
+      required:
+        - page1
+        - page2
+        - pdf
+      properties:
+        page1:
+          $ref: "#/components/schemas/URL"
+        page2:
+          $ref: "#/components/schemas/URL"
+        pdf:
+          $ref: "#/components/schemas/URL"
+
+    CalculationStatus:
+      description: Namkha calculation process status.
+      type: string
+      default: new
+      enum:
+        - new
+        - in progress
+        - done
+        - failed
+      example: new
 
     Coord:
-      description: Decimal point coordinate
+      description: Decimal point coordinate.
       type: number
       format: float
       example: 12.37
 
     DateTime:
-      description: Date-time
+      description: Date-time with TZ offset specified.
       type: string
       format: date-time
       example: 1996-12-19T16:39:57-08:00
+
+    Location:
+      description: Geo location via pair of lat, lon coordinates.
+      type: object
+      required:
+        - lat
+        - lon
+      properties:
+        lat:
+          $ref: "#/components/schemas/Coord"
+        lon:
+          $ref: "#/components/schemas/Coord"
 
     Status_400:
       description: Status code for 400 Bad Request
@@ -220,15 +242,12 @@ components:
       type: object
       required:
         - fraction
+        - gender
         - datetime
+        - geolocation
       properties:
         method:
-          description: Method of calculation, can be classic or by Rinpoche
-          type: string
-          enum:
-            - classic
-            - rinpoche
-          default: rinpoche
+          $ref: "#/components/schemas/NamkhaMethod"
         fraction:
           description: Date fraction used for Namkha calculation
           type: string
@@ -244,7 +263,9 @@ components:
           type: string
           example: John Doe
         gender:
-          description: A gender of person who do the calculation for.
+          description: >
+            A gender of person we do the calculation for. It affects position of Fortune
+            and Capacity aspect (left or right) and corresponding Mewa aspects.
           type: string
           enum:
             - male
@@ -257,6 +278,17 @@ components:
           type: string
           format: date-time
           example: 1996-12-19T16:39:57-08:00
+        location:
+          $ref: "#/components/schemas/Location"
+
+    NamkhaMethod:
+      description: Method of calculation, can be classic or by Rinpoche
+      type: string
+      enum:
+        - classic
+        - rinpoche
+      default: rinpoche
+
 
     ID:
       description: UUID, used for pointing to objects
