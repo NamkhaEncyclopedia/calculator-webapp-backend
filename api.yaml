@@ -6,6 +6,10 @@ info:
     name: Stanislav Davydov
     email: davidovsv@yandex.ru
 
+servers:
+  - url: 'http://localhost:8000/'
+    description: Local server
+
 tags:
   - name: tz
     description: Time zone related endpoints
@@ -13,7 +17,7 @@ tags:
     description: Calculations
 
 paths:
-  /tz/{lat}/{lon}:
+  /tz:
     get:
       operationId: getLocationTz
       tags: [tz]
@@ -21,6 +25,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/lat"
         - $ref: "#/components/parameters/lon"
+        - $ref: "#/components/parameters/date"
       responses:
         200:
           description: Successful response with TZ
@@ -67,9 +72,16 @@ components:
       schema:
         $ref: "#/components/schemas/ID"
 
+    date:
+      name: date
+      in: query
+      description: Date
+      schema:
+        $ref: "#/components/schemas/DateTime"
+
     lat:
       name: lat
-      in: path
+      in: query
       description: Latitude
       required: true
       schema:
@@ -77,7 +89,7 @@ components:
 
     lon:
       name: lon
-      in: path
+      in: query
       description: Longitude
       required: true
       schema:
@@ -244,7 +256,7 @@ components:
         - fraction
         - gender
         - datetime
-        - geolocation
+        - location
       properties:
         method:
           $ref: "#/components/schemas/NamkhaMethod"
@@ -303,4 +315,3 @@ components:
         - Asia/Bangkok
         - GMT+5
         - UTC-1
-
