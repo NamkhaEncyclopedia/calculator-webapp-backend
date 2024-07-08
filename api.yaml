@@ -32,7 +32,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TZ"
+                type: object
+                required:
+                  - tz
+                  - offset
+                properties:
+                  tz:
+                    $ref: "#/components/schemas/TZ"
+                  offset:
+                    type: number
+
         404:
           $ref: "#/components/responses/TZ_404"
 
@@ -76,6 +85,7 @@ components:
       name: date
       in: query
       description: Date
+      required: true
       schema:
         $ref: "#/components/schemas/DateTime"
 

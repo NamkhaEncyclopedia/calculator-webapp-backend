@@ -61,3 +61,9 @@ class CalculationData:
     status: CalculationStatus = CalculationStatus.new
     finished: Optional[datetime] = None
     result: Optional[CalculationResult] = None
+
+
+@dataclass
+class TZResponse:
+    tz: str
+    offset: Decimal
