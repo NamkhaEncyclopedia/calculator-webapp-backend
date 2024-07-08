@@ -5,6 +5,8 @@ from decimal import Decimal
 from enum import Enum
 from typing import Optional
 
+import pys
+
 
 class Method(Enum):
     classic = 'classic'
@@ -30,6 +32,7 @@ class Location:
     lon: Decimal
 
 
+@pys.saveable
 @dataclass
 class NamkhaData:
     fraction: Fraction
@@ -54,10 +57,12 @@ class CalculationResult:
     pdf: str
 
 
+@pys.saveable
 @dataclass
 class CalculationData:
     id: str
     created: datetime
+    namkha_data: NamkhaData
     status: CalculationStatus = CalculationStatus.new
     finished: Optional[datetime] = None
     result: Optional[CalculationResult] = None

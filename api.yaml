@@ -176,6 +176,8 @@ components:
       properties:
         id:
           $ref: "#/components/schemas/ID"
+        namkha_data:
+          $ref: "#/components/schemas/NamkhaData"
         created:
           $ref: "#/components/schemas/DateTime"
         finished:

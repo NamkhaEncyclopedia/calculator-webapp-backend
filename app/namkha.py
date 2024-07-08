@@ -1,8 +1,12 @@
-from datetime import datetime
+import os
+import tempfile
+from datetime import datetime, timezone
 import logging
 import uuid
 from decimal import Decimal
+from pathlib import Path
 
+import pys
 import pytz
 from timezonefinder import TimezoneFinder
 
@@ -10,6 +14,19 @@ from .models import NamkhaData, CalculationData, TZResponse
 
 log = logging.getLogger("namkha.calculation")
 finder = TimezoneFinder()
+
+ENV_NAMKHA_PATH = 'NAMKHA_PATH'
+
+
+def _get_namkha_path():
+    return os.environ.get(ENV_NAMKHA_PATH, tempfile.gettempdir())
+
+
+def _get_storage():
+    p = Path(_get_namkha_path())
+    storage = pys.file_storage(p)
+    log.debug('Initialize file storage at %s', p)
+    return storage
 
 
 def get_tz_info(lat: Decimal, lon: Decimal, date: datetime):
@@ -21,7 +38,27 @@ def get_tz_info(lat: Decimal, lon: Decimal, date: datetime):
 
 
 def calculate(namkha_data: NamkhaData) -> CalculationData:
-    log.debug('Start Namkha calculation by %s', namkha_data)
-    data = CalculationData(id=str(uuid.uuid4()), created=datetime.now())
+    storage = _get_storage()
+    while True:
+        # Find unused ID
+        _id = str(uuid.uuid4())
+        calc = storage.load(CalculationData, _id)
+        if not calc:
+            break
 
-    return data
+    calc = CalculationData(
+        id=_id,
+        namkha_data=namkha_data,
+        created=datetime.now(timezone.utc).astimezone()
+    )
+    storage.save(calc)
+
+    # todo: run Namkha calculations
+
+    return calc
+
+
+def get_calculation_data(calc_id: str) -> CalculationData:
+    storage = _get_storage()
+    calc = storage.load(CalculationData, calc_id)
+    return calc
