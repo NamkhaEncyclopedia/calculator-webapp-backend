@@ -8,19 +8,19 @@ from typing import Optional
 import pys
 
 
-class Method(Enum):
+class Method(str, Enum):
     classic = 'classic'
     rinpoche = 'rinpoche'
 
 
-class Fraction(Enum):
+class Fraction(str, Enum):
     year = 'year'
     month = 'month'
     day = 'day'
     hour = 'hour'
 
 
-class Gender(Enum):
+class Gender(str, Enum):
     male = 'male'
     female = 'female'
 
@@ -43,7 +43,7 @@ class NamkhaData:
     method: Method = Method.rinpoche
 
 
-class CalculationStatus(enum.Enum):
+class CalculationStatus(str, enum.Enum):
     new = 'new'
     in_progress = 'in progress'
     done = 'done'

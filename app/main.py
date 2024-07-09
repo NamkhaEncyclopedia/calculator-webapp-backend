@@ -50,7 +50,7 @@ async def tz(lat: Decimal, lon: Decimal, date: datetime):
     return tz_response
 
 
-@app.post('/calculate', summary='Request Namkha calculation')
+@app.post('/calculate', summary='Request Namkha calculation', status_code=status.HTTP_201_CREATED,)
 async def calculate(namkha_data: NamkhaData):
     calc = namkha.calculate(namkha_data)
     log.debug('Calculate namkha (%s) -> %s', namkha_data, calc)

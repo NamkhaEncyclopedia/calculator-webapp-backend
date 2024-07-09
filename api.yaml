@@ -53,7 +53,7 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/calculate"
       responses:
-        200:
+        201:
           $ref: "#/components/responses/Calc_200"
         400:
           $ref: "#/components/responses/Calc_400"
