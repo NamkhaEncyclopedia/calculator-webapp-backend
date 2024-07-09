@@ -4,12 +4,16 @@ version = "0.1.0"
 description = ""
 authors = ["Namkha Encyclopedia <namkha@simonweiss.space>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
+certifi = "^2024.7.4"
 fastapi = "^0.111.0"
 uvicorn = "^0.30.0"
-
+timezonefinder = "^6.5.2"
+pytz = "^2024.1"
+pysdato = "^0.0.5"
 
 [build-system]
 requires = ["poetry-core"]
